@@ -1,0 +1,27 @@
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <!-- To enable JMX Management -->
+    <jmxConfigurator/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%.-1level|JPA|%-20.20logger{0}|%msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="com.nixmash.rabbitmq" level="info"/>
+    <logger name="org.springframework" level="off"/>
+
+    <!--<logger name="net.nixmash.api" level="off"/>-->
+
+    <!--<include resource="logJpaToFile.xml" />-->
+
+    <root level="off">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>
