@@ -26,7 +26,7 @@ public class MsgSender {
     }
 
     public void sendStringMessage()  {
-        System.out.println("Sending message...");
+//        System.out.println("Sending message...");
         rabbitTemplate.convertAndSend(RabbitConfig.msgQueue, "Sending Simple Message from RabbitMQ!");
         try {
             boolean done =  msgReceiver.getLatch().await(10000, TimeUnit.MILLISECONDS);

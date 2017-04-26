@@ -24,4 +24,5 @@ public class RabbitConfig {
                 new Queue(ApplicationQueue.ReservationCreate, false)
         );
     }
+
 }
