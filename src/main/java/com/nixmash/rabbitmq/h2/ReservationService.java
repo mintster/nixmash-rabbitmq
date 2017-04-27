@@ -9,4 +9,6 @@ public interface ReservationService {
     public abstract List<Reservation> getReservations();
 
     Reservation getReservation(Long id);
+
+    Reservation createReservation(Reservation reservation);
 }

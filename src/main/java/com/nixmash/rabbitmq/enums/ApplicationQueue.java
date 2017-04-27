@@ -6,4 +6,6 @@ package com.nixmash.rabbitmq.enums;
 public class ApplicationQueue {
     public static final String ReservationDisplay = "reservation-display";
     public static final String ReservationCreate = "reservation-create";
+    public static final String ReservationShow = "reservation-show";
+
 }

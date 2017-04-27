@@ -14,7 +14,7 @@
         <routingKeyPattern>%c.%p</routingKeyPattern>
         <generateId>true</generateId>
         <charset>UTF-8</charset>
-        <durable>false</durable>
+        <durable>true</durable>
         <deliveryMode>NON_PERSISTENT</deliveryMode>
         <declareExchange>true</declareExchange>
     </appender>

@@ -32,13 +32,16 @@ public class DataSender {
     public void sendReservationToDisplay()  {
         Reservation reservation = reservationService.getReservation(1L);
 
-//        System.out.println("Sending Reservation object...");
         rabbitTemplate.convertAndSend(ApplicationQueue.ReservationDisplay,reservation);
         getReceipt(dataReceiver.getDisplayLatch(), "DISPLAY");
 
-//        System.out.println("Sending Reservation object for Uppercase Display...");
         rabbitTemplate.convertAndSend(ApplicationQueue.ReservationCreate, reservation);
-        getReceipt(dataReceiver.getCreateLatch(), "UPPER DISPLAY");
+        getReceipt(dataReceiver.getCreateLatch(), "CREATE");
+
+        // keeping the message in the queue just for fun....
+
+        //        Reservation msg = (Reservation) rabbitTemplate.receiveAndConvert(ApplicationQueue.ReservationShow, 10_000);
+        //        System.out.println("receiveAndConvert(): " + msg.toString());
     }
 
     private void getReceipt(CountDownLatch latch, String threadName) {
