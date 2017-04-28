@@ -30,6 +30,6 @@ public class RabbitTests {
 
     @Test
     public void dataTest() throws Exception {
-        dataSender.sendReservationToDisplay();
+        dataSender.createReservation();
     }
 }

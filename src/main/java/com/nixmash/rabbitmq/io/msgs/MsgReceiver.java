@@ -1,6 +1,6 @@
 package com.nixmash.rabbitmq.io.msgs;
 
-import com.nixmash.rabbitmq.config.RabbitConfig;
+import com.nixmash.rabbitmq.enums.ApplicationQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CountDownLatch;
 
 @Component
-@RabbitListener(queues = RabbitConfig.msgQueue)
+@RabbitListener(queues = ApplicationQueue.MessageDisplay)
 public class MsgReceiver {
 
     private static final Logger logger = LoggerFactory.getLogger(MsgReceiver.class);

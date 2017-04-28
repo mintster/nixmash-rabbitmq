@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -44,17 +43,22 @@ public class DataReceiver {
     @RabbitListener(queues = ApplicationQueue.ReservationCreate)
     @SendTo(ApplicationQueue.ReservationShow)
     public Message<Reservation> createReservation(Reservation reservation) {
-        System.out.println("Creating Reservation <" + reservation.toString() + ">");
+        System.out.println("Reservation Received: " + reservation.toString());
         Reservation saved = reservationService.createReservation(reservation);
         return MessageBuilder
                 .withPayload(saved)
-                .setHeader("show", "true")
                 .build();
     }
 
     @RabbitListener(queues = ApplicationQueue.ReservationShow)
-    public Reservation showReservation(Reservation reservation, @Header("show") String show) {
+    public Reservation showReservation(Reservation reservation) {
         return reservation;
+    }
+
+    @RabbitListener(queues = ApplicationQueue.ReservationCreateAndShow)
+    public Reservation createAndReturnReservation(Reservation reservation) {
+        System.out.println("Reservation Received: " + reservation.toString());
+        return reservationService.createReservation(reservation);
     }
 
     public CountDownLatch getDisplayLatch() {

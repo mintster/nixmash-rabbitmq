@@ -1,6 +1,6 @@
 package com.nixmash.rabbitmq.io.msgs;
 
-import com.nixmash.rabbitmq.config.RabbitConfig;
+import com.nixmash.rabbitmq.enums.ApplicationQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,7 +27,7 @@ public class MsgSender {
 
     public void sendStringMessage()  {
 //        System.out.println("Sending message...");
-        rabbitTemplate.convertAndSend(RabbitConfig.msgQueue, "Sending Simple Message from RabbitMQ!");
+        rabbitTemplate.convertAndSend(ApplicationQueue.MessageDisplay, "Sending Simple Message from RabbitMQ!");
         try {
             boolean done =  msgReceiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
             if (!done) {
