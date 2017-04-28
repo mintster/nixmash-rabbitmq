@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -32,34 +33,31 @@ public class DataReceiver {
         this.reservationService = reservationService;
     }
 
-@RabbitListener(queues = ApplicationQueue.ReservationDisplay)
-public void displayReservation(Reservation reservation) {
+    @RabbitListener(queues = ApplicationQueue.ReservationDisplay)
+    public void displayReservation(Reservation reservation) {
         System.out.println("Received Reservation <" + reservation.getReservationName() + ">");
         logger.info("Reservation Received: " + reservation.getReservationName());
         displayLatch.countDown();
     }
 
+
     @RabbitListener(queues = ApplicationQueue.ReservationCreate)
     @SendTo(ApplicationQueue.ReservationShow)
     public Message<Reservation> createReservation(Reservation reservation) {
-        reservation = new Reservation("Tommy");
-        System.out.println("Creating Reservation <" + reservation.getReservationName() + ">");
-        logger.info("New Reservation Name: " + reservation.getReservationName().toUpperCase());
-//        return reservation;
-        createLatch.countDown();
+        System.out.println("Creating Reservation <" + reservation.toString() + ">");
+        Reservation saved = reservationService.createReservation(reservation);
         return MessageBuilder
-                .withPayload(reservation)
-                .setHeader("code", 12345)
+                .withPayload(saved)
+                .setHeader("show", "true")
                 .build();
     }
 
     @RabbitListener(queues = ApplicationQueue.ReservationShow)
-    public Reservation showReservation(Message message) {
-        return (Reservation) message.getPayload();
+    public Reservation showReservation(Reservation reservation, @Header("show") String show) {
+        return reservation;
     }
 
     public CountDownLatch getDisplayLatch() {
-
         return displayLatch;
     }
 

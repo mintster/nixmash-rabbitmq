@@ -2,7 +2,6 @@ package com.nixmash.rabbitmq.io.data;
 
 import com.nixmash.rabbitmq.enums.ApplicationQueue;
 import com.nixmash.rabbitmq.h2.Reservation;
-import com.nixmash.rabbitmq.h2.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,33 +19,20 @@ public class DataSender {
     private static final Logger logger = LoggerFactory.getLogger(DataSender.class);
 
     private final RabbitTemplate rabbitTemplate;
-    private final DataReceiver dataReceiver;
-    private final ReservationService reservationService;
 
-    public DataSender(DataReceiver dataReceiver, RabbitTemplate rabbitTemplate, ReservationService reservationService) {
-        this.dataReceiver = dataReceiver;
+    public DataSender(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
-        this.reservationService = reservationService;
     }
 
-    public void sendReservationToDisplay()  {
-        Reservation reservation = reservationService.getReservation(1L);
-
-        rabbitTemplate.convertAndSend(ApplicationQueue.ReservationDisplay,reservation);
-        getReceipt(dataReceiver.getDisplayLatch(), "DISPLAY");
-
-        rabbitTemplate.convertAndSend(ApplicationQueue.ReservationCreate, reservation);
-        getReceipt(dataReceiver.getCreateLatch(), "CREATE");
-
-        // keeping the message in the queue just for fun....
-
-        //        Reservation msg = (Reservation) rabbitTemplate.receiveAndConvert(ApplicationQueue.ReservationShow, 10_000);
-        //        System.out.println("receiveAndConvert(): " + msg.toString());
+    public void createReservation() {
+        rabbitTemplate.convertAndSend(ApplicationQueue.ReservationCreate, new Reservation("Waldo"));
+        Reservation reservation = (Reservation) rabbitTemplate.receiveAndConvert(ApplicationQueue.ReservationShow, 10_000);
+        System.out.println("Reservation Created: " + reservation.toString());
     }
 
     private void getReceipt(CountDownLatch latch, String threadName) {
         try {
-            boolean done =  latch.await(10000, TimeUnit.MILLISECONDS);
+            boolean done = latch.await(10000, TimeUnit.MILLISECONDS);
             if (!done) {
                 logger.error(String.format("%s THREAD NOT COMPLETE AND TIMEOUT OCCURRED", threadName));
             }
