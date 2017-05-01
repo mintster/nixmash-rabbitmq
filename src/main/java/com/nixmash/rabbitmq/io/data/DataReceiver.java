@@ -34,16 +34,16 @@ public class DataReceiver {
 
     @RabbitListener(queues = ApplicationQueue.ReservationDisplay)
     public void displayReservation(Reservation reservation) {
-        System.out.println("Received Reservation <" + reservation.getReservationName() + ">");
-        logger.info("Reservation Received: " + reservation.getReservationName());
+//        System.out.println("Received Reservation " + reservation.toString() + ">");
+        logger.info("Reservation Received: " + reservation.toString());
         displayLatch.countDown();
     }
-
 
     @RabbitListener(queues = ApplicationQueue.ReservationCreate)
     @SendTo(ApplicationQueue.ReservationShow)
     public Message<Reservation> createReservation(Reservation reservation) {
-        System.out.println("Reservation Received: " + reservation.toString());
+//        System.out.println("Reservation Received: " + reservation.toString());
+        logger.info("Reservation Received: " + reservation.toString());
         Reservation saved = reservationService.createReservation(reservation);
         return MessageBuilder
                 .withPayload(saved)
@@ -57,7 +57,8 @@ public class DataReceiver {
 
     @RabbitListener(queues = ApplicationQueue.ReservationCreateAndShow)
     public Reservation createAndReturnReservation(Reservation reservation) {
-        System.out.println("Reservation Received: " + reservation.toString());
+//        System.out.println("Reservation Received: " + reservation.toString());
+        logger.info("Reservation Received: " + reservation.toString());
         return reservationService.createReservation(reservation);
     }
 

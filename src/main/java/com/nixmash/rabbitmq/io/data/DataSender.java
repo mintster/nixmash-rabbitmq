@@ -16,21 +16,25 @@ public class DataSender {
     private static final Logger logger = LoggerFactory.getLogger(DataSender.class);
 
     private final RabbitTemplate rabbitTemplate;
-    private final RabbitTemplate jsonRabbitTemplate;
 
-    public DataSender(RabbitTemplate rabbitTemplate, RabbitTemplate jsonRabbitTemplate) {
+    public DataSender(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
-        this.jsonRabbitTemplate = jsonRabbitTemplate;
     }
 
     public void createReservation() {
 
-        jsonRabbitTemplate.convertAndSend(ApplicationQueue.ReservationCreate, new Reservation("Waldo"));
-        Reservation reservation = (Reservation) rabbitTemplate.receiveAndConvert(ApplicationQueue.ReservationShow, 10_000);
-        System.out.println("Reservation Created: " + reservation.toString());
+        Reservation reservation = new Reservation();
+
+        // Using @SendTo
+
+        rabbitTemplate.convertAndSend(ApplicationQueue.ReservationCreate, new Reservation("Waldo"));
+        reservation = (Reservation) rabbitTemplate.receiveAndConvert(ApplicationQueue.ReservationShow, 10_000);
+        logger.info("Reservation Created: " + reservation.toString());
+
+        // Sending and Receiving from a Single Queue
 
         reservation = (Reservation) rabbitTemplate.convertSendAndReceive(ApplicationQueue.ReservationCreateAndShow, new Reservation("Pete"));
-        System.out.println("Reservation Created: " + reservation.toString());
+        logger.info("Reservation Created: " + reservation.toString());
     }
 
 }

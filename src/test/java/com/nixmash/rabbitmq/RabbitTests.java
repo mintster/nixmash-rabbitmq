@@ -1,13 +1,20 @@
 package com.nixmash.rabbitmq;
 
+import com.nixmash.rabbitmq.enums.ApplicationQueue;
+import com.nixmash.rabbitmq.h2.Reservation;
 import com.nixmash.rabbitmq.io.data.DataSender;
 import com.nixmash.rabbitmq.io.msgs.MsgSender;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by daveburke on 4/21/17.
@@ -23,13 +30,38 @@ public class RabbitTests {
     @Autowired
     private DataSender dataSender;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
     @Test
-    public void messageTest() throws Exception {
-        msgSender.sendStringMessage();
+    public void createReservation_SingleQueue() throws Exception {
+
+        String queue = ApplicationQueue.ReservationCreateAndShow;
+        String name = "Pete";
+
+        Reservation reservation = new Reservation(name);
+        assertNull(reservation.getId());
+
+        reservation = (Reservation) rabbitTemplate.convertSendAndReceive(queue, reservation);
+        assertNotNull(reservation.getId());
+        assertEquals(reservation.getReservationName(), name);
     }
 
     @Test
-    public void dataTest() throws Exception {
-        dataSender.createReservation();
+    public void createReservation_SendTo() throws Exception {
+
+        String queue = ApplicationQueue.ReservationCreate;
+        String sendToQueue = ApplicationQueue.ReservationShow;
+        String name = "Waldo";
+
+        Reservation reservation = new Reservation(name);
+        assertNull(reservation.getId());
+
+        rabbitTemplate.convertAndSend(queue, reservation);
+        reservation = (Reservation) rabbitTemplate.receiveAndConvert(sendToQueue, 10_000);
+        assertNotNull(reservation.getId());
+        assertEquals(reservation.getReservationName(), name);
     }
+
 }
