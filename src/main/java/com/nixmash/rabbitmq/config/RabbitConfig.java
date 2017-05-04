@@ -1,6 +1,6 @@
 package com.nixmash.rabbitmq.config;
 
-import com.nixmash.rabbitmq.enums.ApplicationQueue;
+import com.nixmash.rabbitmq.enums.ReservationQueue;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +25,11 @@ public class RabbitConfig {
     @Bean
     public List<Queue> qs() {
         return Arrays.asList(
-                new Queue(ApplicationQueue.MessageDisplay),
-                new Queue(ApplicationQueue.ReservationDisplay),
-                new Queue(ApplicationQueue.ReservationCreate),
-                new Queue(ApplicationQueue.ReservationShow),
-                new Queue(ApplicationQueue.ReservationCreateAndShow)
+                new Queue(ReservationQueue.MsgDisplay),
+                new Queue(ReservationQueue.Display),
+                new Queue(ReservationQueue.Create),
+                new Queue(ReservationQueue.Show),
+                new Queue(ReservationQueue.CreateAndShow)
         );
     }
 

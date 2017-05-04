@@ -1,6 +1,6 @@
 package com.nixmash.rabbitmq;
 
-import com.nixmash.rabbitmq.enums.ApplicationQueue;
+import com.nixmash.rabbitmq.enums.ReservationQueue;
 import com.nixmash.rabbitmq.h2.Reservation;
 import com.nixmash.rabbitmq.io.data.DataSender;
 import com.nixmash.rabbitmq.io.msgs.MsgSender;
@@ -37,7 +37,7 @@ public class RabbitTests {
     @Test
     public void createReservation_SingleQueue() throws Exception {
 
-        String queue = ApplicationQueue.ReservationCreateAndShow;
+        String queue = ReservationQueue.CreateAndShow;
         String name = "Pete";
 
         Reservation reservation = new Reservation(name);
@@ -51,8 +51,8 @@ public class RabbitTests {
     @Test
     public void createReservation_SendTo() throws Exception {
 
-        String queue = ApplicationQueue.ReservationCreate;
-        String sendToQueue = ApplicationQueue.ReservationShow;
+        String queue = ReservationQueue.Create;
+        String sendToQueue = ReservationQueue.Show;
         String name = "Waldo";
 
         Reservation reservation = new Reservation(name);

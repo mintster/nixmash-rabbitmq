@@ -1,6 +1,6 @@
 package com.nixmash.rabbitmq.io.data;
 
-import com.nixmash.rabbitmq.enums.ApplicationQueue;
+import com.nixmash.rabbitmq.enums.ReservationQueue;
 import com.nixmash.rabbitmq.h2.Reservation;
 import com.nixmash.rabbitmq.h2.ReservationService;
 import org.slf4j.Logger;
@@ -22,8 +22,8 @@ public class DataReceiver {
 
     private static final Logger logger = LoggerFactory.getLogger(DataReceiver.class);
 
-    private CountDownLatch displayLatch = new CountDownLatch(1);
     private CountDownLatch createLatch = new CountDownLatch(1);
+    private CountDownLatch createAndShowLatch = new CountDownLatch(1);
 
     private final ReservationService reservationService;
 
@@ -32,38 +32,31 @@ public class DataReceiver {
         this.reservationService = reservationService;
     }
 
-    @RabbitListener(queues = ApplicationQueue.ReservationDisplay)
-    public void displayReservation(Reservation reservation) {
-//        System.out.println("Received Reservation " + reservation.toString() + ">");
-        logger.info("Reservation Received: " + reservation.toString());
-        displayLatch.countDown();
-    }
-
-    @RabbitListener(queues = ApplicationQueue.ReservationCreate)
-    @SendTo(ApplicationQueue.ReservationShow)
+    @RabbitListener(queues = ReservationQueue.Create)
+    @SendTo(ReservationQueue.Show)
     public Message<Reservation> createReservation(Reservation reservation) {
-//        System.out.println("Reservation Received: " + reservation.toString());
         logger.info("Reservation Received: " + reservation.toString());
         Reservation saved = reservationService.createReservation(reservation);
+        createLatch.countDown();
         return MessageBuilder
                 .withPayload(saved)
                 .build();
     }
 
-    @RabbitListener(queues = ApplicationQueue.ReservationShow)
+    @RabbitListener(queues = ReservationQueue.Show)
     public Reservation showReservation(Reservation reservation) {
         return reservation;
     }
 
-    @RabbitListener(queues = ApplicationQueue.ReservationCreateAndShow)
+    @RabbitListener(queues = ReservationQueue.CreateAndShow)
     public Reservation createAndReturnReservation(Reservation reservation) {
-//        System.out.println("Reservation Received: " + reservation.toString());
         logger.info("Reservation Received: " + reservation.toString());
+        createAndShowLatch.countDown();
         return reservationService.createReservation(reservation);
     }
 
-    public CountDownLatch getDisplayLatch() {
-        return displayLatch;
+    public CountDownLatch getCreateAndShowLatch() {
+        return createAndShowLatch;
     }
 
     public CountDownLatch getCreateLatch() {

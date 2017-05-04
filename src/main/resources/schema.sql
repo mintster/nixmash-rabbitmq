@@ -1,4 +1,4 @@
-# DROP TABLE IF EXISTS reservations;
+DROP TABLE IF EXISTS reservations;
 CREATE TABLE reservations
 (
 	id BIGINT(20) NOT NULL AUTO_INCREMENT,
