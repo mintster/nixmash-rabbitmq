@@ -9,4 +9,6 @@ public class ReservationQueue {
     public static final String Create = "reservation-create";
     public static final String Show = "reservation-show";
     public static final String CreateAndShow = "reservation-createshow";
+    public static final String JsonCreate = "reservation-jsoncreate";
+
 }
