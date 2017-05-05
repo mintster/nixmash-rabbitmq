@@ -1,17 +1,18 @@
 package com.nixmash.rabbitmq.io.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nixmash.rabbitmq.enums.ReservationQueue;
 import com.nixmash.rabbitmq.h2.Reservation;
 import com.nixmash.rabbitmq.h2.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -54,22 +55,29 @@ public class DataReceiver {
         return reservationService.createReservation(reservation);
     }
 
-/*
-    @RabbitListener(queues = ReservationQueue.JsonCreate)
-    public Reservation createJsonReservation(@Payload Reservation reservation) {
-//        Reservation reservation = deserialize(message.getPayload());
-        logger.info("Message Received: " + reservation.toString());
-        jsonCreateLatch.countDown();
-        return reservationService.createReservation(reservation);
-    }
-*/
+//    @RabbitListener(queues = ReservationQueue.JsonCreate)
+//    public Reservation createJsonReservation(Message message) {
+////        Reservation reservation = deserialize(message.getPayload());
+//        logger.info("Message Received: " + message.toString());
+//        jsonCreateLatch.countDown();
+//        return reservationService.createReservation(reservation);
+//    }
 
     @RabbitListener(queues = ReservationQueue.JsonCreate)
-    public Reservation createJsonReservation(Message message, @Header("VIP") boolean vip) {
-        Reservation reservation = (Reservation) message.getPayload();
+    public Reservation createJsonReservation(Message message) {
+//        Reservation reservation = (Reservation) message.getBody();
+        Reservation reservation = null;
+        ObjectMapper mapper = new ObjectMapper();
+        String json = new String(message.getBody());
+        try {
+            reservation =  mapper.readValue(json, Reservation.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info("Message Received: " + message.toString());
         jsonCreateLatch.countDown();
         return reservationService.createReservation(reservation);
+//        return new Reservation("bob");
     }
 
     // region CountdownLatch

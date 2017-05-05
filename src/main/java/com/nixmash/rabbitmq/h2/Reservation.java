@@ -20,6 +20,7 @@ public class Reservation  implements Serializable {
     public Reservation() {
     }
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

@@ -5,7 +5,6 @@ import com.nixmash.rabbitmq.h2.Reservation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
@@ -61,10 +60,11 @@ public class DataSender {
 //        getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
 //        logger.info("Reservation Created: " + created.toString());
 
-        reservation = new Reservation("Jack");
-        created = (Reservation)
-                rabbitTemplate.convertSendAndReceive(jsonCreateQueue,
-                        MessageBuilder.withPayload(reservation).setHeader("VIP", true).build());
+        // Sending Json
+
+        reservation = new Reservation("Bopper");
+        created = (Reservation) rabbitTemplate.convertSendAndReceive(jsonCreateQueue, reservation);
+
         getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
         logger.info("Reservation Created: " + created.toString());
 
