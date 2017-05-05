@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static com.nixmash.rabbitmq.config.RabbitConfig.exchangeName;
+
 /**
  * Created by daveburke on 4/20/17.
  */
@@ -36,7 +38,7 @@ public class DataSender {
         // Using @SendTo
 
         reservation = new Reservation("Waldo");
-        rabbitTemplate.convertAndSend(createQueue, reservation);
+        rabbitTemplate.convertAndSend(exchangeName, createQueue, reservation);
         getReceipt(dataReceiver.getCreateLatch(), createQueue);
         reservation = (Reservation) rabbitTemplate.receiveAndConvert(showQueue, 10_000);
         logger.info("Reservation Created: " + reservation.toString() + "\n");
@@ -45,7 +47,7 @@ public class DataSender {
 
         reservation = new Reservation("Pete");
         reservation = (Reservation)
-                rabbitTemplate.convertSendAndReceive(createAndShowQueue, reservation);
+                rabbitTemplate.convertSendAndReceive(exchangeName, createAndShowQueue, reservation);
         getReceipt(dataReceiver.getCreateAndShowLatch(), createAndShowQueue);
         logger.info("Reservation Created: " + reservation.toString());
     }
