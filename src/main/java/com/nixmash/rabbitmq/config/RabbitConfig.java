@@ -3,9 +3,6 @@ package com.nixmash.rabbitmq.config;
 import com.nixmash.rabbitmq.enums.ReservationQueue;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,9 +14,8 @@ import java.util.List;
  */
 @Configuration
 public class RabbitConfig {
-//public class RabbitConfig implements RabbitListenerConfigurer {
 
-    public final static String exchangeName = "nixmashmq.exchange";
+    private final static String exchangeName = "nixmashmq.exchange";
 
     @Bean
     TopicExchange exchange() {
@@ -39,16 +35,15 @@ public class RabbitConfig {
         );
     }
 
-    @Bean
-    public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
-        return rabbitTemplate;
-    }
-
-    @Bean
-    public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
-
+//    @Bean
+//    public RabbitTemplate jsonRabbitTemplate(ConnectionFactory connectionFactory) {
+//        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+//        template.setMessageConverter(jsonConverter());
+//        return template;
+//    }
+//
+//    @Bean
+//    public MessageConverter jsonConverter() {
+//        return new Jackson2JsonMessageConverter();
+//    }
 }

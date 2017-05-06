@@ -55,30 +55,29 @@ public class DataReceiver {
         return reservationService.createReservation(reservation);
     }
 
-//    @RabbitListener(queues = ReservationQueue.JsonCreate)
-//    public Reservation createJsonReservation(Message message) {
-////        Reservation reservation = deserialize(message.getPayload());
-//        logger.info("Message Received: " + message.toString());
-//        jsonCreateLatch.countDown();
-//        return reservationService.createReservation(reservation);
-//    }
-
+    // The message.getBody() contains JSON
     @RabbitListener(queues = ReservationQueue.JsonCreate)
     public Reservation createJsonReservation(Message message) {
-//        Reservation reservation = (Reservation) message.getBody();
+        Reservation reservation = JsonToReservation(new String(message.getBody()));
+        logger.info("Message Received: " + message.toString());
+        jsonCreateLatch.countDown();
+        return reservationService.createReservation(reservation);
+    }
+
+    // region Utilities
+
+    public Reservation JsonToReservation(String json) {
         Reservation reservation = null;
         ObjectMapper mapper = new ObjectMapper();
-        String json = new String(message.getBody());
         try {
             reservation =  mapper.readValue(json, Reservation.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger.info("Message Received: " + message.toString());
-        jsonCreateLatch.countDown();
-        return reservationService.createReservation(reservation);
-//        return new Reservation("bob");
+        return reservation;
     }
+
+    // endregion
 
     // region CountdownLatch
 
