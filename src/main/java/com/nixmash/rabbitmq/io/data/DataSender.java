@@ -10,6 +10,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessagePropertiesBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
@@ -26,16 +27,22 @@ public class DataSender {
     private static final Logger logger = LoggerFactory.getLogger(DataSender.class);
 
     private final RabbitTemplate rabbitTemplate;
-    private final RabbitTemplate jsonRabbitTemplate;
     private final DataReceiver dataReceiver;
 
-    public DataSender(RabbitTemplate rabbitTemplate, RabbitTemplate jsonRabbitTemplate, DataReceiver dataReceiver) {
+    @Value("${using.json.rabbitmq.serialization}")
+    private boolean usingJsonSerialization;
+
+    @Value("#{'${current.status.property}' == 'happy'}")
+    private boolean isHappy = false;
+
+    public DataSender(RabbitTemplate rabbitTemplate, DataReceiver dataReceiver) {
         this.rabbitTemplate = rabbitTemplate;
-        this.jsonRabbitTemplate = jsonRabbitTemplate;
         this.dataReceiver = dataReceiver;
     }
 
-    public void createReservation() {
+    public void createReservations() {
+
+        logger.info("Using JSON Serialization: " + usingJsonSerialization + "\n");
 
         Reservation reservation = new Reservation();
         Reservation created = new Reservation();
@@ -64,38 +71,48 @@ public class DataSender {
 
         // endregion
 
-        // Sending Json WITHOUT Jackson2JsonMessageConverter in Rabbit.Config and with MessageBuilder
+        if (usingJsonSerialization) {
 
-        String json = ReservationToJson(new Reservation("Harriet"));
+            // Sending Json WITH Jackson2JsonMessageConverter in Rabbit.Config
 
-        Message jsonMessage = MessageBuilder
-                .withBody(json.getBytes())
-                .andProperties(MessagePropertiesBuilder.newInstance().setContentType("application/json")
-                        .build())
-                .build();
-        created = (Reservation)
-                rabbitTemplate.convertSendAndReceive(jsonCreateQueue, jsonMessage);
-        getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
-        logger.info("Reservation Created: " + created.toString() + "\n");
+            reservation = new Reservation("Jack");
+            created = (Reservation)
+                    rabbitTemplate.convertSendAndReceive(jsonCreateQueue, reservation);
+            getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
+            logger.info("Reservation Created: " + created.toString());
 
-        // Sending Json WITHOUT Jackson2JsonMessageConverter in Rabbit.Config
+        } else {
 
-        json = ReservationToJson(new Reservation("Janet"));
-        created = (Reservation)
-                rabbitTemplate.convertSendAndReceive(jsonCreateQueue, json);
-        getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
-        logger.info("Reservation Created: " + created.toString() + "\n");
+            // Sending Json WITHOUT Jackson2JsonMessageConverter in Rabbit.Config
+            // and using MessageBuilder
 
-        // Sending Json WITH Jackson2JsonMessageConverter in Rabbit.Config
+            String json = reservationToJson(new Reservation("Harriet"));
 
-//                reservation = new Reservation("Jack");
-//                created = (Reservation) rabbitTemplate.convertSendAndReceive(jsonCreateQueue, reservation);
-//                getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
-//                logger.info("Reservation Created: " + created.toString());
+            Message jsonMessage = MessageBuilder
+                    .withBody(json.getBytes())
+                    .andProperties(MessagePropertiesBuilder
+                            .newInstance().setContentType("application/json")
+                            .build())
+                    .build();
+            created = (Reservation)
+                    rabbitTemplate.convertSendAndReceive(jsonCreateQueue, jsonMessage);
+            getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
+            logger.info("Reservation Created: " + created.toString() + "\n");
 
+            // Sending Json WITHOUT Jackson2JsonMessageConverter in Rabbit.Config
+
+/*
+            json = reservationToJson(new Reservation("Janet"));
+            created = (Reservation)
+                    rabbitTemplate.convertSendAndReceive(jsonCreateQueue, json);
+            getReceipt(dataReceiver.getJsonCreateLatch(), jsonCreateQueue);
+            logger.info("Reservation Created: " + created.toString() + "\n");
+*/
+
+        }
     }
 
-    private String ReservationToJson(Reservation reservation) {
+    private String reservationToJson(Reservation reservation) {
         ObjectMapper mapper = new ObjectMapper();
         String json = null;
         try {

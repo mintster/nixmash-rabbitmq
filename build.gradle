@@ -22,3 +22,8 @@ dependencies {
 	testCompile "org.mockito:mockito-core"
 	testCompile "org.hamcrest:hamcrest-library"
 }
+
+bootRun {
+	systemProperties System.properties as Map<String, ?>
+	main = 'com.nixmash.rabbitmq.Application'
+}

@@ -55,10 +55,11 @@ public class DataReceiver {
         return reservationService.createReservation(reservation);
     }
 
-    // The message.getBody() contains JSON
+    // The message.getBody() contains JSON or String
+
     @RabbitListener(queues = ReservationQueue.JsonCreate)
     public Reservation createJsonReservation(Message message) {
-        Reservation reservation = JsonToReservation(new String(message.getBody()));
+        Reservation reservation = jsonToReservation(new String(message.getBody()));
         logger.info("Message Received: " + message.toString());
         jsonCreateLatch.countDown();
         return reservationService.createReservation(reservation);
@@ -66,7 +67,7 @@ public class DataReceiver {
 
     // region Utilities
 
-    public Reservation JsonToReservation(String json) {
+    public Reservation jsonToReservation(String json) {
         Reservation reservation = null;
         ObjectMapper mapper = new ObjectMapper();
         try {

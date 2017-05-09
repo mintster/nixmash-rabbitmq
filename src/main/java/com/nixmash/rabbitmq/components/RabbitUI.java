@@ -21,6 +21,6 @@ public class RabbitUI {
 
     public void init() {
         System.out.println();
-        dataSender.createReservation();
+        dataSender.createReservations();
     }
 }

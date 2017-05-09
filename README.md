@@ -5,10 +5,13 @@ An application demonstrating RabbitMQ and Spring AMQP.
 
 ## Branches, Feature and NixMash Posts (Newest First)
 
-### nixmashmq-v0.2.0 - Producing and Consuming (in Progress)
+### nixmashmq-v0.3.0 - MQ Server and Client Design (in progress)
+
+### nixmashmq-v0.2.0 - Simple Producing and Consuming
  
 - [NixMash Link: RabbitMQ JSON Messages with Spring Boot AMQP](http://nixmash.com/post/rabbitmq-json-messages-with-spring-boot-amqp)
-- [Two RabbitMQ Data Creation Examples in Spring AMQP](http://nixmash.com/post/two-data-creation-rabbitmq-examples-with-spring-amqp)
+- [Nixmash Post: Two RabbitMQ Data Creation Examples in Spring AMQP](http://nixmash.com/post/two-data-creation-rabbitmq-examples-with-spring-amqp)
+- [Nixmash Post: Sending JSON to RabbitMQ Queues with Spring AMQP](http://nixmash.com/post/sending-json-to-rabbitmq-queues-with-spring-amqp)
 
 ### nixmashmq-v0.1.0 - AMQPAppender Logging
 
